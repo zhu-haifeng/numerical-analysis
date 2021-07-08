@@ -1,0 +1,189 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>gauss_jordon</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-03"><meta name="DC.source" content="gauss_jordon.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"> <span class="keyword">function</span> [x ] = gauss_jordon(A,b)
+
+	<span class="comment">%&#21028;&#26029;&#19968;&#19979;A&#26159;&#21542;&#21512;&#29702;</span>
+    [m1,m2] = size(A);
+    <span class="keyword">if</span> m1 ~= m2
+        error(<span class="string">'&#31995;&#25968;&#30697;&#38453;A&#19981;&#26159;&#26041;&#38453;'</span>)
+        <span class="keyword">return</span>
+    <span class="keyword">end</span>
+    siz = m1;
+    [n1,n2] = size(b);
+
+    <span class="comment">%&#21028;&#26029;&#19968;&#19979;b&#26159;&#21542;&#21512;&#29702;</span>
+    <span class="keyword">if</span> n2 == siz &amp;&amp; n1==1
+        b = b';
+    <span class="keyword">elseif</span> n1==1 &amp;&amp; n2 == siz
+        b = b;
+    <span class="keyword">else</span>
+        error(<span class="string">'b&#30340;&#22823;&#23567;&#19982;A&#19981;&#30456;&#21305;&#37197;'</span>)
+    <span class="keyword">end</span>
+
+    <span class="comment">%</span>
+    <span class="keyword">if</span> rank(A)~=rank([A,b])
+        error(<span class="string">'A&#30340;&#30697;&#38453;&#30340;&#31209;&#21644;&#22686;&#24191;&#30697;&#38453;&#30340;&#31209;&#19981;&#30456;&#21516;&#65292;&#26041;&#31243;&#19981;&#23384;&#22312;&#21807;&#19968;&#30340;&#35299;'</span>);
+        <span class="keyword">return</span>;
+    <span class="keyword">end</span>
+
+    <span class="comment">%&#23558;A&#22686;&#24191;</span>
+    A = [A,b];
+    x = zeros(siz,1);
+
+    <span class="keyword">for</span> i = 1:siz-1
+        a_ii = abs(A(i,i));
+        [max_v,max_id_relative] = max(abs(A(i:siz)));
+        max_id = i + max_id_relative - 1;
+        <span class="keyword">if</span> max_id ~=i
+            A([i,max_id],:) = A([max_id,i],:);
+        <span class="keyword">end</span>
+
+        <span class="comment">%&#28040;&#20803;</span>
+        <span class="keyword">for</span> j = i+1:siz
+            A(j,:) = A(j,:) - (A(j,i)/A(i,i)) * A(i,:);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    x(siz) = A(siz,siz+1)/A(siz,siz);
+    <span class="keyword">for</span> i = siz-1:-1:1
+<span class="comment">%         'A(i,i+1:siz)'</span>
+<span class="comment">%         A(i,i+1:siz)</span>
+<span class="comment">%         'x(i+1:siz)'</span>
+<span class="comment">%         x(i+1:siz)</span>
+        x(i) = (A(i,siz+1) - A(i,i+1:siz)*x(i+1:siz)) / A(i,i);
+    <span class="keyword">end</span>
+
+<span class="keyword">return</span>
+</pre><pre class="codeoutput error">&#36755;&#20837;&#21442;&#25968;&#30340;&#25968;&#30446;&#19981;&#36275;&#12290;
+
+&#20986;&#38169; gauss_jordon (line 4)
+    [m1,m2] = size(A);
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+ function [x ] = gauss_jordon(A,b)
+ 
+	%判断一下A是否合理
+    [m1,m2] = size(A);
+    if m1 ~= m2
+        error('系数矩阵A不是方阵')
+        return    
+    end
+    siz = m1;
+    [n1,n2] = size(b);
+    
+    %判断一下b是否合理
+    if n2 == siz && n1==1
+        b = b';
+    elseif n1==1 && n2 == siz
+        b = b;
+    else
+        error('b的大小与A不相匹配')
+    end
+    
+    %
+    if rank(A)~=rank([A,b])
+        error('A的矩阵的秩和增广矩阵的秩不相同，方程不存在唯一的解');
+        return;
+    end
+    
+    %将A增广
+    A = [A,b];
+    x = zeros(siz,1);
+    
+    for i = 1:siz-1
+        a_ii = abs(A(i,i));
+        [max_v,max_id_relative] = max(abs(A(i:siz)));
+        max_id = i + max_id_relative - 1;
+        if max_id ~=i 
+            A([i,max_id],:) = A([max_id,i],:);
+        end
+        
+        %消元
+        for j = i+1:siz
+            A(j,:) = A(j,:) - (A(j,i)/A(i,i)) * A(i,:);
+        end
+    end
+    
+    x(siz) = A(siz,siz+1)/A(siz,siz);
+    for i = siz-1:-1:1
+%         'A(i,i+1:siz)'
+%         A(i,i+1:siz)
+%         'x(i+1:siz)'       
+%         x(i+1:siz)
+        x(i) = (A(i,siz+1) - A(i,i+1:siz)*x(i+1:siz)) / A(i,i);
+    end
+    
+return 
+        
+    
+    
+    
+##### SOURCE END #####
+--></body></html>
